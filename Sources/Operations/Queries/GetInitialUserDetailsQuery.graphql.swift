@@ -7,7 +7,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
   public static let operationName: String = "GetInitialUserDetails"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query GetInitialUserDetails { viewer { __typename preferredName liveSecretKey accounts { __typename number } accountUserRoles { __typename id user { __typename id } account { __typename id brand number properties { __typename address postcode electricityMeterPoints { __typename id mpan gspGroupId meters { __typename id serialNumber } status agreements(excludeFuture: true) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on HalfHourlyTariff { id displayName fullName description tariffCode productCode standingCharge } ... on StandardTariff { id displayName fullName description tariffCode productCode unitRate standingCharge } } } } } } } } }"#
+      #"query GetInitialUserDetails { viewer { __typename preferredName liveSecretKey accounts { __typename number } accountUserRoles { __typename id user { __typename id } account { __typename id brand number properties { __typename address postcode electricityMeterPoints { __typename id mpan gspGroupId meters { __typename id serialNumber } status agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on HalfHourlyTariff { id displayName description fullName tariffCode productCode standingCharge } ... on StandardTariff { id displayName description fullName tariffCode productCode unitRate standingCharge } ... on DayNightTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate offPeakRate } ... on PrepayTariff { id displayName description fullName tariffCode productCode standingCharge unitRate } } } } } } } } }"#
     ))
 
   public init() {}
@@ -167,7 +167,10 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                 .field("gspGroupId", String?.self),
                 .field("meters", [Meter?]?.self),
                 .field("status", String?.self),
-                .field("agreements", [Agreement?]?.self, arguments: ["excludeFuture": true]),
+                .field("agreements", [Agreement?]?.self, arguments: [
+                  "includeInactive": true,
+                  "excludeFuture": false
+                ]),
               ] }
 
               public var id: OctopusAPI.ID { __data["id"] }
@@ -234,10 +237,16 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                     .field("__typename", String.self),
                     .inlineFragment(AsHalfHourlyTariff.self),
                     .inlineFragment(AsStandardTariff.self),
+                    .inlineFragment(AsDayNightTariff.self),
+                    .inlineFragment(AsThreeRateTariff.self),
+                    .inlineFragment(AsPrepayTariff.self),
                   ] }
 
                   public var asHalfHourlyTariff: AsHalfHourlyTariff? { _asInlineFragment() }
                   public var asStandardTariff: AsStandardTariff? { _asInlineFragment() }
+                  public var asDayNightTariff: AsDayNightTariff? { _asInlineFragment() }
+                  public var asThreeRateTariff: AsThreeRateTariff? { _asInlineFragment() }
+                  public var asPrepayTariff: AsPrepayTariff? { _asInlineFragment() }
 
                   /// Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint.Agreement.Tariff.AsHalfHourlyTariff
                   ///
@@ -251,8 +260,8 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                     public static var __selections: [ApolloAPI.Selection] { [
                       .field("id", OctopusAPI.ID?.self),
                       .field("displayName", String?.self),
-                      .field("fullName", String?.self),
                       .field("description", String?.self),
+                      .field("fullName", String?.self),
                       .field("tariffCode", String?.self),
                       .field("productCode", String?.self),
                       .field("standingCharge", Double?.self),
@@ -260,8 +269,8 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
 
                     public var id: OctopusAPI.ID? { __data["id"] }
                     public var displayName: String? { __data["displayName"] }
-                    public var fullName: String? { __data["fullName"] }
                     public var description: String? { __data["description"] }
+                    public var fullName: String? { __data["fullName"] }
                     /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
                     public var tariffCode: String? { __data["tariffCode"] }
                     public var productCode: String? { __data["productCode"] }
@@ -280,8 +289,8 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                     public static var __selections: [ApolloAPI.Selection] { [
                       .field("id", OctopusAPI.ID?.self),
                       .field("displayName", String?.self),
-                      .field("fullName", String?.self),
                       .field("description", String?.self),
+                      .field("fullName", String?.self),
                       .field("tariffCode", String?.self),
                       .field("productCode", String?.self),
                       .field("unitRate", Double?.self),
@@ -290,13 +299,112 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
 
                     public var id: OctopusAPI.ID? { __data["id"] }
                     public var displayName: String? { __data["displayName"] }
-                    public var fullName: String? { __data["fullName"] }
                     public var description: String? { __data["description"] }
+                    public var fullName: String? { __data["fullName"] }
                     /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
                     public var tariffCode: String? { __data["tariffCode"] }
                     public var productCode: String? { __data["productCode"] }
                     public var unitRate: Double? { __data["unitRate"] }
                     public var standingCharge: Double? { __data["standingCharge"] }
+                  }
+
+                  /// Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint.Agreement.Tariff.AsDayNightTariff
+                  ///
+                  /// Parent Type: `DayNightTariff`
+                  public struct AsDayNightTariff: OctopusAPI.InlineFragment {
+                    public let __data: DataDict
+                    public init(_dataDict: DataDict) { __data = _dataDict }
+
+                    public typealias RootEntityType = GetInitialUserDetailsQuery.Data.Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint.Agreement.Tariff
+                    public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.DayNightTariff }
+                    public static var __selections: [ApolloAPI.Selection] { [
+                      .field("id", OctopusAPI.ID?.self),
+                      .field("displayName", String?.self),
+                      .field("description", String?.self),
+                      .field("fullName", String?.self),
+                      .field("tariffCode", String?.self),
+                      .field("productCode", String?.self),
+                      .field("standingCharge", Double?.self),
+                      .field("dayRate", Double?.self),
+                      .field("nightRate", Double?.self),
+                    ] }
+
+                    public var id: OctopusAPI.ID? { __data["id"] }
+                    public var displayName: String? { __data["displayName"] }
+                    public var description: String? { __data["description"] }
+                    public var fullName: String? { __data["fullName"] }
+                    /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
+                    public var tariffCode: String? { __data["tariffCode"] }
+                    public var productCode: String? { __data["productCode"] }
+                    public var standingCharge: Double? { __data["standingCharge"] }
+                    public var dayRate: Double? { __data["dayRate"] }
+                    public var nightRate: Double? { __data["nightRate"] }
+                  }
+
+                  /// Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint.Agreement.Tariff.AsThreeRateTariff
+                  ///
+                  /// Parent Type: `ThreeRateTariff`
+                  public struct AsThreeRateTariff: OctopusAPI.InlineFragment {
+                    public let __data: DataDict
+                    public init(_dataDict: DataDict) { __data = _dataDict }
+
+                    public typealias RootEntityType = GetInitialUserDetailsQuery.Data.Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint.Agreement.Tariff
+                    public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.ThreeRateTariff }
+                    public static var __selections: [ApolloAPI.Selection] { [
+                      .field("id", OctopusAPI.ID?.self),
+                      .field("displayName", String?.self),
+                      .field("description", String?.self),
+                      .field("fullName", String?.self),
+                      .field("tariffCode", String?.self),
+                      .field("productCode", String?.self),
+                      .field("standingCharge", Double?.self),
+                      .field("dayRate", Double?.self),
+                      .field("nightRate", Double?.self),
+                      .field("offPeakRate", Double?.self),
+                    ] }
+
+                    public var id: OctopusAPI.ID? { __data["id"] }
+                    public var displayName: String? { __data["displayName"] }
+                    public var description: String? { __data["description"] }
+                    public var fullName: String? { __data["fullName"] }
+                    /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
+                    public var tariffCode: String? { __data["tariffCode"] }
+                    public var productCode: String? { __data["productCode"] }
+                    public var standingCharge: Double? { __data["standingCharge"] }
+                    public var dayRate: Double? { __data["dayRate"] }
+                    public var nightRate: Double? { __data["nightRate"] }
+                    public var offPeakRate: Double? { __data["offPeakRate"] }
+                  }
+
+                  /// Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint.Agreement.Tariff.AsPrepayTariff
+                  ///
+                  /// Parent Type: `PrepayTariff`
+                  public struct AsPrepayTariff: OctopusAPI.InlineFragment {
+                    public let __data: DataDict
+                    public init(_dataDict: DataDict) { __data = _dataDict }
+
+                    public typealias RootEntityType = GetInitialUserDetailsQuery.Data.Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint.Agreement.Tariff
+                    public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.PrepayTariff }
+                    public static var __selections: [ApolloAPI.Selection] { [
+                      .field("id", OctopusAPI.ID?.self),
+                      .field("displayName", String?.self),
+                      .field("description", String?.self),
+                      .field("fullName", String?.self),
+                      .field("tariffCode", String?.self),
+                      .field("productCode", String?.self),
+                      .field("standingCharge", Double?.self),
+                      .field("unitRate", Double?.self),
+                    ] }
+
+                    public var id: OctopusAPI.ID? { __data["id"] }
+                    public var displayName: String? { __data["displayName"] }
+                    public var description: String? { __data["description"] }
+                    public var fullName: String? { __data["fullName"] }
+                    /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
+                    public var tariffCode: String? { __data["tariffCode"] }
+                    public var productCode: String? { __data["productCode"] }
+                    public var standingCharge: Double? { __data["standingCharge"] }
+                    public var unitRate: Double? { __data["unitRate"] }
                   }
                 }
               }
