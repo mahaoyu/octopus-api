@@ -7,7 +7,7 @@ public class GetEnergyProductsQuery: GraphQLQuery {
   public static let operationName: String = "GetEnergyProducts"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query GetEnergyProducts($postcode: String!, $first: Int!, $brands: [String!]!) { energyProducts( postcode: $postcode first: $first brands: $brands availability: AVAILABLE filterBy: DOMESTIC ) { __typename edges { __typename node { __typename id availableFrom availableTo displayName fullName code direction notes isChargedHalfHourly isVariable isGreen term tariffs(postcode: $postcode, first: $first) { __typename edges { __typename node { __typename ... on StandardTariff { id displayName description productCode tariffCode fullName unitRate standingCharge } ... on DayNightTariff { id } ... on ThreeRateTariff { id } ... on GasTariffType { id } } } } } } } }"#
+      #"query GetEnergyProducts($postcode: String!, $first: Int!, $brands: [String!]!) { energyProducts( postcode: $postcode first: $first brands: $brands availability: AVAILABLE filterBy: DOMESTIC ) { __typename edges { __typename node { __typename id availableFrom availableTo displayName fullName code direction notes isChargedHalfHourly isVariable isPrepay isGreen term isAvailable isUnavailable isFixed isDomestic exitFees exitFeesType tariffs(postcode: $postcode, first: $first) { __typename edges { __typename node { __typename ... on StandardTariff { id displayName description productCode tariffCode fullName standingCharge unitRate } ... on DayNightTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate offPeakRate } ... on GasTariffType { id displayName description productCode tariffCode fullName standingCharge unitRate } } } } } } } }"#
     ))
 
   public var postcode: String
@@ -100,8 +100,15 @@ public class GetEnergyProductsQuery: GraphQLQuery {
             .field("notes", String.self),
             .field("isChargedHalfHourly", Bool.self),
             .field("isVariable", Bool.self),
+            .field("isPrepay", Bool.self),
             .field("isGreen", Bool.self),
             .field("term", Int?.self),
+            .field("isAvailable", Bool?.self),
+            .field("isUnavailable", Bool?.self),
+            .field("isFixed", Bool?.self),
+            .field("isDomestic", Bool?.self),
+            .field("exitFees", Int?.self),
+            .field("exitFeesType", String?.self),
             .field("tariffs", Tariffs?.self, arguments: [
               "postcode": .variable("postcode"),
               "first": .variable("first")
@@ -121,9 +128,18 @@ public class GetEnergyProductsQuery: GraphQLQuery {
           public var notes: String { __data["notes"] }
           public var isChargedHalfHourly: Bool { __data["isChargedHalfHourly"] }
           public var isVariable: Bool { __data["isVariable"] }
+          public var isPrepay: Bool { __data["isPrepay"] }
           public var isGreen: Bool { __data["isGreen"] }
           /// Duration of agreements using this product in months
           public var term: Int? { __data["term"] }
+          public var isAvailable: Bool? { __data["isAvailable"] }
+          public var isUnavailable: Bool? { __data["isUnavailable"] }
+          public var isFixed: Bool? { __data["isFixed"] }
+          public var isDomestic: Bool? { __data["isDomestic"] }
+          /// The exit fee applied per fuel if the agreement is ended early. Total value is determined by exit fee type, i.e. this value is either a flat cost or cost per year/month remaining on the agreement.
+          public var exitFees: Int? { __data["exitFees"] }
+          /// Determines how the exit fee is calculated.
+          public var exitFeesType: String? { __data["exitFeesType"] }
           /// A list of tariffs per product for a given postcode.
           public var tariffs: Tariffs? { __data["tariffs"] }
 
@@ -196,8 +212,8 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                     .field("productCode", String?.self),
                     .field("tariffCode", String?.self),
                     .field("fullName", String?.self),
-                    .field("unitRate", Double?.self),
                     .field("standingCharge", Double?.self),
+                    .field("unitRate", Double?.self),
                   ] }
 
                   public var id: OctopusAPI.ID? { __data["id"] }
@@ -207,8 +223,8 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                   /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
                   public var tariffCode: String? { __data["tariffCode"] }
                   public var fullName: String? { __data["fullName"] }
-                  public var unitRate: Double? { __data["unitRate"] }
                   public var standingCharge: Double? { __data["standingCharge"] }
+                  public var unitRate: Double? { __data["unitRate"] }
                 }
 
                 /// EnergyProducts.Edge.Node.Tariffs.Edge.Node.AsDayNightTariff
@@ -222,9 +238,26 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                   public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.DayNightTariff }
                   public static var __selections: [ApolloAPI.Selection] { [
                     .field("id", OctopusAPI.ID?.self),
+                    .field("displayName", String?.self),
+                    .field("description", String?.self),
+                    .field("productCode", String?.self),
+                    .field("tariffCode", String?.self),
+                    .field("fullName", String?.self),
+                    .field("standingCharge", Double?.self),
+                    .field("dayRate", Double?.self),
+                    .field("nightRate", Double?.self),
                   ] }
 
                   public var id: OctopusAPI.ID? { __data["id"] }
+                  public var displayName: String? { __data["displayName"] }
+                  public var description: String? { __data["description"] }
+                  public var productCode: String? { __data["productCode"] }
+                  /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
+                  public var tariffCode: String? { __data["tariffCode"] }
+                  public var fullName: String? { __data["fullName"] }
+                  public var standingCharge: Double? { __data["standingCharge"] }
+                  public var dayRate: Double? { __data["dayRate"] }
+                  public var nightRate: Double? { __data["nightRate"] }
                 }
 
                 /// EnergyProducts.Edge.Node.Tariffs.Edge.Node.AsThreeRateTariff
@@ -238,9 +271,28 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                   public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.ThreeRateTariff }
                   public static var __selections: [ApolloAPI.Selection] { [
                     .field("id", OctopusAPI.ID?.self),
+                    .field("displayName", String?.self),
+                    .field("description", String?.self),
+                    .field("productCode", String?.self),
+                    .field("tariffCode", String?.self),
+                    .field("fullName", String?.self),
+                    .field("standingCharge", Double?.self),
+                    .field("dayRate", Double?.self),
+                    .field("nightRate", Double?.self),
+                    .field("offPeakRate", Double?.self),
                   ] }
 
                   public var id: OctopusAPI.ID? { __data["id"] }
+                  public var displayName: String? { __data["displayName"] }
+                  public var description: String? { __data["description"] }
+                  public var productCode: String? { __data["productCode"] }
+                  /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
+                  public var tariffCode: String? { __data["tariffCode"] }
+                  public var fullName: String? { __data["fullName"] }
+                  public var standingCharge: Double? { __data["standingCharge"] }
+                  public var dayRate: Double? { __data["dayRate"] }
+                  public var nightRate: Double? { __data["nightRate"] }
+                  public var offPeakRate: Double? { __data["offPeakRate"] }
                 }
 
                 /// EnergyProducts.Edge.Node.Tariffs.Edge.Node.AsGasTariffType
@@ -254,9 +306,24 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                   public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.GasTariffType }
                   public static var __selections: [ApolloAPI.Selection] { [
                     .field("id", OctopusAPI.ID?.self),
+                    .field("displayName", String?.self),
+                    .field("description", String?.self),
+                    .field("productCode", String?.self),
+                    .field("tariffCode", String?.self),
+                    .field("fullName", String?.self),
+                    .field("standingCharge", Double?.self),
+                    .field("unitRate", Double?.self),
                   ] }
 
                   public var id: OctopusAPI.ID? { __data["id"] }
+                  public var displayName: String? { __data["displayName"] }
+                  public var description: String? { __data["description"] }
+                  public var productCode: String? { __data["productCode"] }
+                  /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
+                  public var tariffCode: String? { __data["tariffCode"] }
+                  public var fullName: String? { __data["fullName"] }
+                  public var standingCharge: Double? { __data["standingCharge"] }
+                  public var unitRate: Double? { __data["unitRate"] }
                 }
               }
             }
