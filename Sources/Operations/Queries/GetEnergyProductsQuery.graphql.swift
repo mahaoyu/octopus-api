@@ -7,27 +7,39 @@ public class GetEnergyProductsQuery: GraphQLQuery {
   public static let operationName: String = "GetEnergyProducts"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query GetEnergyProducts($postcode: String!, $first: Int!, $brands: [String!]!) { energyProducts( postcode: $postcode first: $first brands: $brands availability: AVAILABLE filterBy: DOMESTIC ) { __typename edges { __typename node { __typename id availableFrom availableTo displayName fullName code direction notes isChargedHalfHourly isVariable isPrepay isGreen term isAvailable isUnavailable isFixed isDomestic exitFees exitFeesType tariffs(postcode: $postcode, first: $first) { __typename edges { __typename node { __typename ... on StandardTariff { id displayName description productCode tariffCode fullName standingCharge unitRate } ... on DayNightTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate offPeakRate } ... on GasTariffType { id displayName description productCode tariffCode fullName standingCharge unitRate } } } } } } } }"#
+      #"query GetEnergyProducts($postcode: String!, $first: Int!, $brands: [String!]!, $availability: EnergyProductAvailability, $cursorProductsAfter: String, $cursorTariffsAfter: String) { energyProducts( postcode: $postcode first: $first brands: $brands filterBy: DOMESTIC availability: $availability after: $cursorProductsAfter ) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename id availableFrom availableTo displayName fullName code direction notes isChargedHalfHourly isVariable isPrepay isGreen term isAvailable isUnavailable isFixed isDomestic exitFees exitFeesType tariffs(postcode: $postcode, first: $first, after: $cursorTariffsAfter) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename ... on StandardTariff { id displayName description productCode tariffCode fullName standingCharge unitRate } ... on DayNightTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate offPeakRate } ... on GasTariffType { id displayName description productCode tariffCode fullName standingCharge unitRate } } } } } } } }"#
     ))
 
   public var postcode: String
   public var first: Int
   public var brands: [String]
+  public var availability: GraphQLNullable<GraphQLEnum<EnergyProductAvailability>>
+  public var cursorProductsAfter: GraphQLNullable<String>
+  public var cursorTariffsAfter: GraphQLNullable<String>
 
   public init(
     postcode: String,
     first: Int,
-    brands: [String]
+    brands: [String],
+    availability: GraphQLNullable<GraphQLEnum<EnergyProductAvailability>>,
+    cursorProductsAfter: GraphQLNullable<String>,
+    cursorTariffsAfter: GraphQLNullable<String>
   ) {
     self.postcode = postcode
     self.first = first
     self.brands = brands
+    self.availability = availability
+    self.cursorProductsAfter = cursorProductsAfter
+    self.cursorTariffsAfter = cursorTariffsAfter
   }
 
   public var __variables: Variables? { [
     "postcode": postcode,
     "first": first,
-    "brands": brands
+    "brands": brands,
+    "availability": availability,
+    "cursorProductsAfter": cursorProductsAfter,
+    "cursorTariffsAfter": cursorTariffsAfter
   ] }
 
   public struct Data: OctopusAPI.SelectionSet {
@@ -40,8 +52,9 @@ public class GetEnergyProductsQuery: GraphQLQuery {
         "postcode": .variable("postcode"),
         "first": .variable("first"),
         "brands": .variable("brands"),
-        "availability": "AVAILABLE",
-        "filterBy": "DOMESTIC"
+        "filterBy": "DOMESTIC",
+        "availability": .variable("availability"),
+        "after": .variable("cursorProductsAfter")
       ]),
     ] }
 
@@ -58,11 +71,46 @@ public class GetEnergyProductsQuery: GraphQLQuery {
       public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.EnergyProductConnectionTypeConnection }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
+        .field("pageInfo", PageInfo.self),
+        .field("totalCount", Int.self),
+        .field("edgeCount", Int.self),
         .field("edges", [Edge?].self),
       ] }
 
+      /// Pagination data for this connection.
+      public var pageInfo: PageInfo { __data["pageInfo"] }
+      /// Total number of nodes.
+      public var totalCount: Int { __data["totalCount"] }
+      /// Number of nodes in the edge.
+      public var edgeCount: Int { __data["edgeCount"] }
       /// Contains the nodes in this connection.
       public var edges: [Edge?] { __data["edges"] }
+
+      /// EnergyProducts.PageInfo
+      ///
+      /// Parent Type: `PageInfo`
+      public struct PageInfo: OctopusAPI.SelectionSet {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.PageInfo }
+        public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("hasNextPage", Bool.self),
+          .field("hasPreviousPage", Bool.self),
+          .field("startCursor", String?.self),
+          .field("endCursor", String?.self),
+        ] }
+
+        /// When paginating forwards, are there more items?
+        public var hasNextPage: Bool { __data["hasNextPage"] }
+        /// When paginating backwards, are there more items?
+        public var hasPreviousPage: Bool { __data["hasPreviousPage"] }
+        /// When paginating backwards, the cursor to continue.
+        public var startCursor: String? { __data["startCursor"] }
+        /// When paginating forwards, the cursor to continue.
+        public var endCursor: String? { __data["endCursor"] }
+      }
 
       /// EnergyProducts.Edge
       ///
@@ -74,9 +122,12 @@ public class GetEnergyProductsQuery: GraphQLQuery {
         public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.EnergyProductConnectionTypeEdge }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
+          .field("cursor", String.self),
           .field("node", Node?.self),
         ] }
 
+        /// A cursor for use in pagination
+        public var cursor: String { __data["cursor"] }
         /// The item at the end of the edge
         public var node: Node? { __data["node"] }
 
@@ -111,7 +162,8 @@ public class GetEnergyProductsQuery: GraphQLQuery {
             .field("exitFeesType", String?.self),
             .field("tariffs", Tariffs?.self, arguments: [
               "postcode": .variable("postcode"),
-              "first": .variable("first")
+              "first": .variable("first"),
+              "after": .variable("cursorTariffsAfter")
             ]),
           ] }
 
@@ -153,11 +205,46 @@ public class GetEnergyProductsQuery: GraphQLQuery {
             public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.EnergyTariffConnectionTypeConnection }
             public static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
+              .field("pageInfo", PageInfo.self),
+              .field("totalCount", Int.self),
+              .field("edgeCount", Int.self),
               .field("edges", [Edge?].self),
             ] }
 
+            /// Pagination data for this connection.
+            public var pageInfo: PageInfo { __data["pageInfo"] }
+            /// Total number of nodes.
+            public var totalCount: Int { __data["totalCount"] }
+            /// Number of nodes in the edge.
+            public var edgeCount: Int { __data["edgeCount"] }
             /// Contains the nodes in this connection.
             public var edges: [Edge?] { __data["edges"] }
+
+            /// EnergyProducts.Edge.Node.Tariffs.PageInfo
+            ///
+            /// Parent Type: `PageInfo`
+            public struct PageInfo: OctopusAPI.SelectionSet {
+              public let __data: DataDict
+              public init(_dataDict: DataDict) { __data = _dataDict }
+
+              public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.PageInfo }
+              public static var __selections: [ApolloAPI.Selection] { [
+                .field("__typename", String.self),
+                .field("hasNextPage", Bool.self),
+                .field("hasPreviousPage", Bool.self),
+                .field("startCursor", String?.self),
+                .field("endCursor", String?.self),
+              ] }
+
+              /// When paginating forwards, are there more items?
+              public var hasNextPage: Bool { __data["hasNextPage"] }
+              /// When paginating backwards, are there more items?
+              public var hasPreviousPage: Bool { __data["hasPreviousPage"] }
+              /// When paginating backwards, the cursor to continue.
+              public var startCursor: String? { __data["startCursor"] }
+              /// When paginating forwards, the cursor to continue.
+              public var endCursor: String? { __data["endCursor"] }
+            }
 
             /// EnergyProducts.Edge.Node.Tariffs.Edge
             ///
@@ -169,9 +256,12 @@ public class GetEnergyProductsQuery: GraphQLQuery {
               public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.EnergyTariffConnectionTypeEdge }
               public static var __selections: [ApolloAPI.Selection] { [
                 .field("__typename", String.self),
+                .field("cursor", String.self),
                 .field("node", Node?.self),
               ] }
 
+              /// A cursor for use in pagination
+              public var cursor: String { __data["cursor"] }
               /// The item at the end of the edge
               public var node: Node? { __data["node"] }
 

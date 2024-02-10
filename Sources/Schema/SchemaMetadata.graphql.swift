@@ -25,6 +25,7 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
     case "Query": return OctopusAPI.Objects.Query
     case "KrakenVersionType": return OctopusAPI.Objects.KrakenVersionType
     case "EnergyProductConnectionTypeConnection": return OctopusAPI.Objects.EnergyProductConnectionTypeConnection
+    case "PageInfo": return OctopusAPI.Objects.PageInfo
     case "EnergyProductConnectionTypeEdge": return OctopusAPI.Objects.EnergyProductConnectionTypeEdge
     case "EnergyProductType": return OctopusAPI.Objects.EnergyProductType
     case "EnergyTariffConnectionTypeConnection": return OctopusAPI.Objects.EnergyTariffConnectionTypeConnection
