@@ -7,7 +7,7 @@ public class GetEnergyProductsQuery: GraphQLQuery {
   public static let operationName: String = "GetEnergyProducts"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query GetEnergyProducts($postcode: String!, $first: Int!, $brands: [String!]!, $availability: EnergyProductAvailability, $cursorProductsAfter: String, $cursorTariffsAfter: String) { energyProducts( postcode: $postcode first: $first brands: $brands filterBy: DOMESTIC availability: $availability after: $cursorProductsAfter ) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename id availableFrom availableTo displayName fullName description code direction notes isChargedHalfHourly isVariable isPrepay isGreen term isAvailable isUnavailable isFixed isDomestic exitFees exitFeesType tariffs(postcode: $postcode, first: $first, after: $cursorTariffsAfter) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename ... on StandardTariff { id displayName description productCode tariffCode fullName standingCharge unitRate } ... on DayNightTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate offPeakRate } ... on GasTariffType { id displayName description productCode tariffCode fullName standingCharge unitRate } } } } } } } }"#
+      #"query GetEnergyProducts($postcode: String!, $first: Int!, $brands: [String!]!, $availability: EnergyProductAvailability, $cursorProductsAfter: String, $cursorTariffsAfter: String) { energyProducts( postcode: $postcode first: $first brands: $brands filterBy: DOMESTIC availability: $availability after: $cursorProductsAfter ) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename id availableFrom availableTo direction code displayName fullName description notes isChargedHalfHourly isVariable isPrepay isGreen term isHidden isAvailable isUnavailable isFixed isDomestic exitFees exitFeesType tariffs(postcode: $postcode, first: $first, after: $cursorTariffsAfter) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename ... on StandardTariff { id displayName description productCode tariffCode fullName standingCharge preVatStandingCharge unitRate preVatUnitRate } ... on DayNightTariff { id displayName description productCode tariffCode fullName standingCharge preVatStandingCharge dayRate preVatDayRate nightRate preVatNightRate } ... on ThreeRateTariff { id displayName description productCode tariffCode fullName standingCharge preVatStandingCharge dayRate preVatDayRate nightRate preVatNightRate offPeakRate preVatOffPeakRate } ... on GasTariffType { id displayName description productCode tariffCode fullName standingCharge preVatStandingCharge unitRate preVatUnitRate } } } } } } } }"#
     ))
 
   public var postcode: String
@@ -144,17 +144,18 @@ public class GetEnergyProductsQuery: GraphQLQuery {
             .field("id", OctopusAPI.ID.self),
             .field("availableFrom", OctopusAPI.DateTime.self),
             .field("availableTo", OctopusAPI.DateTime?.self),
+            .field("direction", GraphQLEnum<OctopusAPI.EnergyProductDirection>?.self),
+            .field("code", String.self),
             .field("displayName", String.self),
             .field("fullName", String.self),
             .field("description", String.self),
-            .field("code", String.self),
-            .field("direction", GraphQLEnum<OctopusAPI.EnergyProductDirection>?.self),
             .field("notes", String.self),
             .field("isChargedHalfHourly", Bool.self),
             .field("isVariable", Bool.self),
             .field("isPrepay", Bool.self),
             .field("isGreen", Bool.self),
             .field("term", Int?.self),
+            .field("isHidden", Bool.self),
             .field("isAvailable", Bool?.self),
             .field("isUnavailable", Bool?.self),
             .field("isFixed", Bool?.self),
@@ -171,14 +172,14 @@ public class GetEnergyProductsQuery: GraphQLQuery {
           public var id: OctopusAPI.ID { __data["id"] }
           public var availableFrom: OctopusAPI.DateTime { __data["availableFrom"] }
           public var availableTo: OctopusAPI.DateTime? { __data["availableTo"] }
+          /// Whether the product is an import or export product.
+          public var direction: GraphQLEnum<OctopusAPI.EnergyProductDirection>? { __data["direction"] }
+          public var code: String { __data["code"] }
           /// This name will be shown to customers during sign-up
           public var displayName: String { __data["displayName"] }
           public var fullName: String { __data["fullName"] }
           /// This will be shown to customers during sign-up
           public var description: String { __data["description"] }
-          public var code: String { __data["code"] }
-          /// Whether the product is an import or export product.
-          public var direction: GraphQLEnum<OctopusAPI.EnergyProductDirection>? { __data["direction"] }
           /// These are internal notes to explain why this product exists
           public var notes: String { __data["notes"] }
           public var isChargedHalfHourly: Bool { __data["isChargedHalfHourly"] }
@@ -187,6 +188,8 @@ public class GetEnergyProductsQuery: GraphQLQuery {
           public var isGreen: Bool { __data["isGreen"] }
           /// Duration of agreements using this product in months
           public var term: Int? { __data["term"] }
+          /// Whether to hide this product from the direct registration journey
+          public var isHidden: Bool { __data["isHidden"] }
           public var isAvailable: Bool? { __data["isAvailable"] }
           public var isUnavailable: Bool? { __data["isUnavailable"] }
           public var isFixed: Bool? { __data["isFixed"] }
@@ -306,7 +309,9 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                     .field("tariffCode", String?.self),
                     .field("fullName", String?.self),
                     .field("standingCharge", Double?.self),
+                    .field("preVatStandingCharge", Double?.self),
                     .field("unitRate", Double?.self),
+                    .field("preVatUnitRate", Double?.self),
                   ] }
 
                   public var id: OctopusAPI.ID? { __data["id"] }
@@ -317,7 +322,9 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                   public var tariffCode: String? { __data["tariffCode"] }
                   public var fullName: String? { __data["fullName"] }
                   public var standingCharge: Double? { __data["standingCharge"] }
+                  public var preVatStandingCharge: Double? { __data["preVatStandingCharge"] }
                   public var unitRate: Double? { __data["unitRate"] }
+                  public var preVatUnitRate: Double? { __data["preVatUnitRate"] }
                 }
 
                 /// EnergyProducts.Edge.Node.Tariffs.Edge.Node.AsDayNightTariff
@@ -337,8 +344,11 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                     .field("tariffCode", String?.self),
                     .field("fullName", String?.self),
                     .field("standingCharge", Double?.self),
+                    .field("preVatStandingCharge", Double?.self),
                     .field("dayRate", Double?.self),
+                    .field("preVatDayRate", Double?.self),
                     .field("nightRate", Double?.self),
+                    .field("preVatNightRate", Double?.self),
                   ] }
 
                   public var id: OctopusAPI.ID? { __data["id"] }
@@ -349,8 +359,11 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                   public var tariffCode: String? { __data["tariffCode"] }
                   public var fullName: String? { __data["fullName"] }
                   public var standingCharge: Double? { __data["standingCharge"] }
+                  public var preVatStandingCharge: Double? { __data["preVatStandingCharge"] }
                   public var dayRate: Double? { __data["dayRate"] }
+                  public var preVatDayRate: Double? { __data["preVatDayRate"] }
                   public var nightRate: Double? { __data["nightRate"] }
+                  public var preVatNightRate: Double? { __data["preVatNightRate"] }
                 }
 
                 /// EnergyProducts.Edge.Node.Tariffs.Edge.Node.AsThreeRateTariff
@@ -370,9 +383,13 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                     .field("tariffCode", String?.self),
                     .field("fullName", String?.self),
                     .field("standingCharge", Double?.self),
+                    .field("preVatStandingCharge", Double?.self),
                     .field("dayRate", Double?.self),
+                    .field("preVatDayRate", Double?.self),
                     .field("nightRate", Double?.self),
+                    .field("preVatNightRate", Double?.self),
                     .field("offPeakRate", Double?.self),
+                    .field("preVatOffPeakRate", Double?.self),
                   ] }
 
                   public var id: OctopusAPI.ID? { __data["id"] }
@@ -383,9 +400,13 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                   public var tariffCode: String? { __data["tariffCode"] }
                   public var fullName: String? { __data["fullName"] }
                   public var standingCharge: Double? { __data["standingCharge"] }
+                  public var preVatStandingCharge: Double? { __data["preVatStandingCharge"] }
                   public var dayRate: Double? { __data["dayRate"] }
+                  public var preVatDayRate: Double? { __data["preVatDayRate"] }
                   public var nightRate: Double? { __data["nightRate"] }
+                  public var preVatNightRate: Double? { __data["preVatNightRate"] }
                   public var offPeakRate: Double? { __data["offPeakRate"] }
+                  public var preVatOffPeakRate: Double? { __data["preVatOffPeakRate"] }
                 }
 
                 /// EnergyProducts.Edge.Node.Tariffs.Edge.Node.AsGasTariffType
@@ -405,7 +426,9 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                     .field("tariffCode", String?.self),
                     .field("fullName", String?.self),
                     .field("standingCharge", Double?.self),
+                    .field("preVatStandingCharge", Double?.self),
                     .field("unitRate", Double?.self),
+                    .field("preVatUnitRate", Double?.self),
                   ] }
 
                   public var id: OctopusAPI.ID? { __data["id"] }
@@ -416,7 +439,9 @@ public class GetEnergyProductsQuery: GraphQLQuery {
                   public var tariffCode: String? { __data["tariffCode"] }
                   public var fullName: String? { __data["fullName"] }
                   public var standingCharge: Double? { __data["standingCharge"] }
+                  public var preVatStandingCharge: Double? { __data["preVatStandingCharge"] }
                   public var unitRate: Double? { __data["unitRate"] }
+                  public var preVatUnitRate: Double? { __data["preVatUnitRate"] }
                 }
               }
             }
