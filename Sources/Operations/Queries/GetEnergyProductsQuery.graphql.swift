@@ -7,7 +7,7 @@ public class GetEnergyProductsQuery: GraphQLQuery {
   public static let operationName: String = "GetEnergyProducts"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query GetEnergyProducts($postcode: String!, $first: Int!, $brands: [String!]!, $availability: EnergyProductAvailability, $cursorProductsAfter: String, $cursorTariffsAfter: String) { energyProducts( postcode: $postcode first: $first brands: $brands filterBy: DOMESTIC availability: $availability after: $cursorProductsAfter ) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename id availableFrom availableTo displayName fullName code direction notes isChargedHalfHourly isVariable isPrepay isGreen term isAvailable isUnavailable isFixed isDomestic exitFees exitFeesType tariffs(postcode: $postcode, first: $first, after: $cursorTariffsAfter) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename ... on StandardTariff { id displayName description productCode tariffCode fullName standingCharge unitRate } ... on DayNightTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate offPeakRate } ... on GasTariffType { id displayName description productCode tariffCode fullName standingCharge unitRate } } } } } } } }"#
+      #"query GetEnergyProducts($postcode: String!, $first: Int!, $brands: [String!]!, $availability: EnergyProductAvailability, $cursorProductsAfter: String, $cursorTariffsAfter: String) { energyProducts( postcode: $postcode first: $first brands: $brands filterBy: DOMESTIC availability: $availability after: $cursorProductsAfter ) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename id availableFrom availableTo displayName fullName description code direction notes isChargedHalfHourly isVariable isPrepay isGreen term isAvailable isUnavailable isFixed isDomestic exitFees exitFeesType tariffs(postcode: $postcode, first: $first, after: $cursorTariffsAfter) { __typename pageInfo { __typename hasNextPage hasPreviousPage startCursor endCursor } totalCount edgeCount edges { __typename cursor node { __typename ... on StandardTariff { id displayName description productCode tariffCode fullName standingCharge unitRate } ... on DayNightTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description productCode tariffCode fullName standingCharge dayRate nightRate offPeakRate } ... on GasTariffType { id displayName description productCode tariffCode fullName standingCharge unitRate } } } } } } } }"#
     ))
 
   public var postcode: String
@@ -146,6 +146,7 @@ public class GetEnergyProductsQuery: GraphQLQuery {
             .field("availableTo", OctopusAPI.DateTime?.self),
             .field("displayName", String.self),
             .field("fullName", String.self),
+            .field("description", String.self),
             .field("code", String.self),
             .field("direction", GraphQLEnum<OctopusAPI.EnergyProductDirection>?.self),
             .field("notes", String.self),
@@ -173,6 +174,8 @@ public class GetEnergyProductsQuery: GraphQLQuery {
           /// This name will be shown to customers during sign-up
           public var displayName: String { __data["displayName"] }
           public var fullName: String { __data["fullName"] }
+          /// This will be shown to customers during sign-up
+          public var description: String { __data["description"] }
           public var code: String { __data["code"] }
           /// Whether the product is an import or export product.
           public var direction: GraphQLEnum<OctopusAPI.EnergyProductDirection>? { __data["direction"] }
