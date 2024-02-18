@@ -57,6 +57,7 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
     case "RestrictedGasAgreement": return OctopusAPI.Objects.RestrictedGasAgreement
     case "ElectricityAgreementType": return OctopusAPI.Objects.ElectricityAgreementType
     case "GasAgreementType": return OctopusAPI.Objects.GasAgreementType
+    case "GasMeterRegisterType": return OctopusAPI.Objects.GasMeterRegisterType
     default: return nil
     }
   }
