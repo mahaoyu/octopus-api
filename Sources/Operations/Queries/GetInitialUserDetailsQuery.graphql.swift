@@ -7,7 +7,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
   public static let operationName: String = "GetInitialUserDetails"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query GetInitialUserDetails { viewer { __typename preferredName liveSecretKey accounts { __typename number } accountUserRoles { __typename id user { __typename id } account { __typename id brand number properties { __typename address postcode electricityMeterPoints { __typename id mpan gspGroupId meters { __typename id serialNumber } status agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on HalfHourlyTariff { id displayName description fullName tariffCode productCode standingCharge } ... on StandardTariff { id displayName description fullName tariffCode productCode unitRate standingCharge } ... on DayNightTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate offPeakRate } ... on PrepayTariff { id displayName description fullName tariffCode productCode standingCharge unitRate } } } } } } } } }"#
+      #"query GetInitialUserDetails { viewer { __typename preferredName liveSecretKey accounts { __typename number } accountUserRoles { __typename id user { __typename id } account { __typename id brand number properties { __typename address postcode electricityMeterPoints { __typename id mpan gspGroupId meters { __typename id serialNumber } status agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on HalfHourlyTariff { id displayName description fullName tariffCode productCode standingCharge } ... on StandardTariff { id displayName description fullName tariffCode productCode unitRate standingCharge } ... on DayNightTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate offPeakRate } ... on PrepayTariff { id displayName description fullName tariffCode productCode standingCharge unitRate } } } } gasMeterPoints { __typename id mprn meters { __typename id serialNumber } } } } } } }"#
     ))
 
   public init() {}
@@ -144,6 +144,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
               .field("address", String?.self),
               .field("postcode", String.self),
               .field("electricityMeterPoints", [ElectricityMeterPoint?]?.self),
+              .field("gasMeterPoints", [GasMeterPoint?]?.self),
             ] }
 
             /// The address of the property, formatted into a single string
@@ -151,6 +152,8 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
             public var postcode: String { __data["postcode"] }
             /// Retrieve the details of an electricity meter-point.
             public var electricityMeterPoints: [ElectricityMeterPoint?]? { __data["electricityMeterPoints"] }
+            /// Retrieve the details of a gas meter-point.
+            public var gasMeterPoints: [GasMeterPoint?]? { __data["gasMeterPoints"] }
 
             /// Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint
             ///
@@ -407,6 +410,44 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                     public var unitRate: Double? { __data["unitRate"] }
                   }
                 }
+              }
+            }
+
+            /// Viewer.AccountUserRole.Account.Property.GasMeterPoint
+            ///
+            /// Parent Type: `GasMeterPointType`
+            public struct GasMeterPoint: OctopusAPI.SelectionSet {
+              public let __data: DataDict
+              public init(_dataDict: DataDict) { __data = _dataDict }
+
+              public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.GasMeterPointType }
+              public static var __selections: [ApolloAPI.Selection] { [
+                .field("__typename", String.self),
+                .field("id", OctopusAPI.ID.self),
+                .field("mprn", String?.self),
+                .field("meters", [Meter?]?.self),
+              ] }
+
+              public var id: OctopusAPI.ID { __data["id"] }
+              public var mprn: String? { __data["mprn"] }
+              public var meters: [Meter?]? { __data["meters"] }
+
+              /// Viewer.AccountUserRole.Account.Property.GasMeterPoint.Meter
+              ///
+              /// Parent Type: `GasMeterType`
+              public struct Meter: OctopusAPI.SelectionSet {
+                public let __data: DataDict
+                public init(_dataDict: DataDict) { __data = _dataDict }
+
+                public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.GasMeterType }
+                public static var __selections: [ApolloAPI.Selection] { [
+                  .field("__typename", String.self),
+                  .field("id", OctopusAPI.ID.self),
+                  .field("serialNumber", String.self),
+                ] }
+
+                public var id: OctopusAPI.ID { __data["id"] }
+                public var serialNumber: String { __data["serialNumber"] }
               }
             }
           }
