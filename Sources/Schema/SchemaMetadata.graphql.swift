@@ -42,22 +42,22 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
     case "AccountType": return OctopusAPI.Objects.AccountType
     case "AccountUserRoleType": return OctopusAPI.Objects.AccountUserRoleType
     case "PropertyType": return OctopusAPI.Objects.PropertyType
-    case "ElectricityMeterPointType": return OctopusAPI.Objects.ElectricityMeterPointType
     case "GasMeterPointType": return OctopusAPI.Objects.GasMeterPointType
-    case "ElectricityMeterType": return OctopusAPI.Objects.ElectricityMeterType
+    case "ElectricityMeterPointType": return OctopusAPI.Objects.ElectricityMeterPointType
+    case "GasMeterType": return OctopusAPI.Objects.GasMeterType
     case "InkTag": return OctopusAPI.Objects.InkTag
     case "InkGenericMessage": return OctopusAPI.Objects.InkGenericMessage
     case "InkBucket": return OctopusAPI.Objects.InkBucket
-    case "GasMeterType": return OctopusAPI.Objects.GasMeterType
+    case "ElectricityMeterType": return OctopusAPI.Objects.ElectricityMeterType
     case "EmailEventType": return OctopusAPI.Objects.EmailEventType
     case "PrintEventType": return OctopusAPI.Objects.PrintEventType
     case "PrintMessageType": return OctopusAPI.Objects.PrintMessageType
     case "AccountFileAttachment": return OctopusAPI.Objects.AccountFileAttachment
     case "RestrictedElectricityAgreement": return OctopusAPI.Objects.RestrictedElectricityAgreement
     case "RestrictedGasAgreement": return OctopusAPI.Objects.RestrictedGasAgreement
-    case "ElectricityAgreementType": return OctopusAPI.Objects.ElectricityAgreementType
-    case "GasAgreementType": return OctopusAPI.Objects.GasAgreementType
     case "GasMeterRegisterType": return OctopusAPI.Objects.GasMeterRegisterType
+    case "GasAgreementType": return OctopusAPI.Objects.GasAgreementType
+    case "ElectricityAgreementType": return OctopusAPI.Objects.ElectricityAgreementType
     default: return nil
     }
   }
