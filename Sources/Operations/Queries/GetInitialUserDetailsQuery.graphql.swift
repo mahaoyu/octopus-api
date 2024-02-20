@@ -7,7 +7,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
   public static let operationName: String = "GetInitialUserDetails"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query GetInitialUserDetails { viewer { __typename preferredName liveSecretKey accounts { __typename number } accountUserRoles { __typename id user { __typename id } account { __typename id brand number properties { __typename address postcode electricityMeterPoints { __typename id mpan gspGroupId meters { __typename id serialNumber } status agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on HalfHourlyTariff { id displayName description fullName tariffCode productCode standingCharge } ... on StandardTariff { id displayName description fullName tariffCode productCode unitRate standingCharge } ... on DayNightTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate offPeakRate } ... on PrepayTariff { id displayName description fullName tariffCode productCode standingCharge unitRate } } } } gasMeterPoints { __typename id meters { __typename id serialNumber meterType units correction readingFactor pulseValue fuelType consumptionUnits location manufacturedYear manufacturerCode modelName hasAndAllowsHhReadings meterPoint { __typename confirmationReference currentDmSoq currentNdmSoq endUserCategory eucIdentifier exitCapacityChargeRate exitZone formulaYearSmpAq formulaYearSmpSoq hasOpenClosingReadDispute hasOpenOpeningReadDispute id igtCheckedAt igtIdentifier ldz ldzCapacityChargeRate ldzCommodityChargeRate ldzCustomerChargeRate marketCategory marketSectorCode meterOwnershipType meterReadBatchFrequency mprn mrfType newSupplierId nominationShipperReference nominationType ntsExitCommodityChargeRate oldSupplierId requiresEnrolment requiresWithdrawal smartStartDate status statusUpdatedAt supplyClass supplyEndDate supplyPointCategory targetSsd xoserveStatus } } agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo } } } } } } }"#
+      #"query GetInitialUserDetails { viewer { __typename preferredName liveSecretKey accounts { __typename number } accountUserRoles { __typename id user { __typename id } account { __typename id brand number properties { __typename address postcode electricityMeterPoints { __typename id mpan gspGroupId meters(includeInactive: false) { __typename id serialNumber } status agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on HalfHourlyTariff { id displayName description fullName tariffCode productCode standingCharge } ... on StandardTariff { id displayName description fullName tariffCode productCode unitRate standingCharge } ... on DayNightTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate offPeakRate } ... on PrepayTariff { id displayName description fullName tariffCode productCode standingCharge unitRate } } } } gasMeterPoints { __typename id mprn meters { __typename id serialNumber meterType units correction readingFactor pulseValue fuelType consumptionUnits location manufacturedYear manufacturerCode modelName hasAndAllowsHhReadings meterPoint { __typename confirmationReference currentDmSoq currentNdmSoq endUserCategory eucIdentifier exitCapacityChargeRate exitZone formulaYearSmpAq formulaYearSmpSoq hasOpenClosingReadDispute hasOpenOpeningReadDispute id igtCheckedAt igtIdentifier ldz ldzCapacityChargeRate ldzCommodityChargeRate ldzCustomerChargeRate marketCategory marketSectorCode meterOwnershipType meterReadBatchFrequency mprn mrfType newSupplierId nominationShipperReference nominationType ntsExitCommodityChargeRate oldSupplierId requiresEnrolment requiresWithdrawal smartStartDate status statusUpdatedAt supplyClass supplyEndDate supplyPointCategory targetSsd xoserveStatus } } agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on GasTariffType { id displayName description fullName tariffCode productCode standingCharge } } } } } } } } }"#
     ))
 
   public init() {}
@@ -168,7 +168,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                 .field("id", OctopusAPI.ID.self),
                 .field("mpan", String.self),
                 .field("gspGroupId", String?.self),
-                .field("meters", [Meter?]?.self),
+                .field("meters", [Meter?]?.self, arguments: ["includeInactive": false]),
                 .field("status", String?.self),
                 .field("agreements", [Agreement?]?.self, arguments: [
                   "includeInactive": true,
@@ -424,6 +424,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
               public static var __selections: [ApolloAPI.Selection] { [
                 .field("__typename", String.self),
                 .field("id", OctopusAPI.ID.self),
+                .field("mprn", String?.self),
                 .field("meters", [Meter?]?.self),
                 .field("agreements", [Agreement?]?.self, arguments: [
                   "includeInactive": true,
@@ -432,6 +433,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
               ] }
 
               public var id: OctopusAPI.ID { __data["id"] }
+              public var mprn: String? { __data["mprn"] }
               public var meters: [Meter?]? { __data["meters"] }
               /// A list of gas agreements belonging to an account that is linked to the viewer. Filters out expired agreements by default.
               public var agreements: [Agreement?]? { __data["agreements"] }
@@ -596,6 +598,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                   .field("validTo", OctopusAPI.DateTime?.self),
                   .field("agreedFrom", OctopusAPI.DateTime?.self),
                   .field("agreedTo", OctopusAPI.DateTime?.self),
+                  .field("tariff", Tariff?.self),
                 ] }
 
                 public var id: Int? { __data["id"] }
@@ -603,6 +606,36 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                 public var validTo: OctopusAPI.DateTime? { __data["validTo"] }
                 public var agreedFrom: OctopusAPI.DateTime? { __data["agreedFrom"] }
                 public var agreedTo: OctopusAPI.DateTime? { __data["agreedTo"] }
+                public var tariff: Tariff? { __data["tariff"] }
+
+                /// Viewer.AccountUserRole.Account.Property.GasMeterPoint.Agreement.Tariff
+                ///
+                /// Parent Type: `GasTariffType`
+                public struct Tariff: OctopusAPI.SelectionSet {
+                  public let __data: DataDict
+                  public init(_dataDict: DataDict) { __data = _dataDict }
+
+                  public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.GasTariffType }
+                  public static var __selections: [ApolloAPI.Selection] { [
+                    .field("__typename", String.self),
+                    .field("id", OctopusAPI.ID?.self),
+                    .field("displayName", String?.self),
+                    .field("description", String?.self),
+                    .field("fullName", String?.self),
+                    .field("tariffCode", String?.self),
+                    .field("productCode", String?.self),
+                    .field("standingCharge", Double?.self),
+                  ] }
+
+                  public var id: OctopusAPI.ID? { __data["id"] }
+                  public var displayName: String? { __data["displayName"] }
+                  public var description: String? { __data["description"] }
+                  public var fullName: String? { __data["fullName"] }
+                  /// Describes a particular tariff by combining the product code, number of rates, available from date and GSP code.
+                  public var tariffCode: String? { __data["tariffCode"] }
+                  public var productCode: String? { __data["productCode"] }
+                  public var standingCharge: Double? { __data["standingCharge"] }
+                }
               }
             }
           }
