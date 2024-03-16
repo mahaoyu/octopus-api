@@ -24,6 +24,7 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
     switch typename {
     case "Query": return OctopusAPI.Objects.Query
     case "KrakenVersionType": return OctopusAPI.Objects.KrakenVersionType
+    case "SmartMeterTelemetryType": return OctopusAPI.Objects.SmartMeterTelemetryType
     case "EnergyProductConnectionTypeConnection": return OctopusAPI.Objects.EnergyProductConnectionTypeConnection
     case "PageInfo": return OctopusAPI.Objects.PageInfo
     case "EnergyProductConnectionTypeEdge": return OctopusAPI.Objects.EnergyProductConnectionTypeEdge
@@ -55,6 +56,7 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
     case "AccountFileAttachment": return OctopusAPI.Objects.AccountFileAttachment
     case "RestrictedElectricityAgreement": return OctopusAPI.Objects.RestrictedElectricityAgreement
     case "RestrictedGasAgreement": return OctopusAPI.Objects.RestrictedGasAgreement
+    case "SmartMeterDeviceType": return OctopusAPI.Objects.SmartMeterDeviceType
     case "ElectricityAgreementType": return OctopusAPI.Objects.ElectricityAgreementType
     case "GasAgreementType": return OctopusAPI.Objects.GasAgreementType
     default: return nil

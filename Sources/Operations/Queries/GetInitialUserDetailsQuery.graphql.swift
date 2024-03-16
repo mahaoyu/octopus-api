@@ -7,7 +7,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
   public static let operationName: String = "GetInitialUserDetails"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query GetInitialUserDetails { viewer { __typename preferredName liveSecretKey accounts { __typename number } accountUserRoles { __typename id user { __typename id } account { __typename id brand number properties { __typename address postcode electricityMeterPoints { __typename id mpan gspGroupId meters(includeInactive: false) { __typename id serialNumber } status agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on HalfHourlyTariff { id displayName description fullName tariffCode productCode standingCharge } ... on StandardTariff { id displayName description fullName tariffCode productCode unitRate standingCharge } ... on DayNightTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate offPeakRate } ... on PrepayTariff { id displayName description fullName tariffCode productCode standingCharge unitRate } } } } gasMeterPoints { __typename id mprn meters { __typename id serialNumber meterType units correction readingFactor pulseValue fuelType consumptionUnits location manufacturedYear manufacturerCode modelName hasAndAllowsHhReadings meterPoint { __typename confirmationReference currentDmSoq currentNdmSoq endUserCategory eucIdentifier exitCapacityChargeRate exitZone formulaYearSmpAq formulaYearSmpSoq hasOpenClosingReadDispute hasOpenOpeningReadDispute id igtCheckedAt igtIdentifier ldz ldzCapacityChargeRate ldzCommodityChargeRate ldzCustomerChargeRate marketCategory marketSectorCode meterOwnershipType meterReadBatchFrequency mprn mrfType newSupplierId nominationShipperReference nominationType ntsExitCommodityChargeRate oldSupplierId requiresEnrolment requiresWithdrawal smartStartDate status statusUpdatedAt supplyClass supplyEndDate supplyPointCategory targetSsd xoserveStatus } } agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on GasTariffType { id displayName description fullName tariffCode productCode standingCharge } } } } } } } } }"#
+      #"query GetInitialUserDetails { viewer { __typename preferredName liveSecretKey accounts { __typename number } accountUserRoles { __typename id user { __typename id } account { __typename id brand number properties { __typename address postcode electricityMeterPoints { __typename id mpan gspGroupId meters(includeInactive: false) { __typename id serialNumber hasAndAllowsHhReadings smartDevices { __typename deviceId status serialNumber type model manufacturer } } status agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on HalfHourlyTariff { id displayName description fullName tariffCode productCode standingCharge } ... on StandardTariff { id displayName description fullName tariffCode productCode unitRate standingCharge } ... on DayNightTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate } ... on ThreeRateTariff { id displayName description fullName tariffCode productCode standingCharge dayRate nightRate offPeakRate } ... on PrepayTariff { id displayName description fullName tariffCode productCode standingCharge unitRate } } } } gasMeterPoints { __typename id mprn meters { __typename id serialNumber meterType units correction readingFactor pulseValue fuelType consumptionUnits location manufacturedYear manufacturerCode modelName hasAndAllowsHhReadings smartDevices { __typename deviceId status serialNumber type model manufacturer } meterPoint { __typename confirmationReference currentDmSoq currentNdmSoq endUserCategory eucIdentifier exitCapacityChargeRate exitZone formulaYearSmpAq formulaYearSmpSoq hasOpenClosingReadDispute hasOpenOpeningReadDispute id igtCheckedAt igtIdentifier ldz ldzCapacityChargeRate ldzCommodityChargeRate ldzCustomerChargeRate marketCategory marketSectorCode meterOwnershipType meterReadBatchFrequency mprn mrfType newSupplierId nominationShipperReference nominationType ntsExitCommodityChargeRate oldSupplierId requiresEnrolment requiresWithdrawal smartStartDate status statusUpdatedAt supplyClass supplyEndDate supplyPointCategory targetSsd xoserveStatus } } agreements(includeInactive: true, excludeFuture: false) { __typename id validFrom validTo agreedFrom agreedTo tariff { __typename ... on GasTariffType { id displayName description fullName tariffCode productCode standingCharge } } } } } } } } }"#
     ))
 
   public init() {}
@@ -197,10 +197,41 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                   .field("__typename", String.self),
                   .field("id", OctopusAPI.ID.self),
                   .field("serialNumber", String.self),
+                  .field("hasAndAllowsHhReadings", Bool?.self),
+                  .field("smartDevices", [SmartDevice?]?.self),
                 ] }
 
                 public var id: OctopusAPI.ID { __data["id"] }
                 public var serialNumber: String { __data["serialNumber"] }
+                /// Returns if the meter has and allows half hourly readings
+                public var hasAndAllowsHhReadings: Bool? { __data["hasAndAllowsHhReadings"] }
+                public var smartDevices: [SmartDevice?]? { __data["smartDevices"] }
+
+                /// Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint.Meter.SmartDevice
+                ///
+                /// Parent Type: `SmartMeterDeviceType`
+                public struct SmartDevice: OctopusAPI.SelectionSet {
+                  public let __data: DataDict
+                  public init(_dataDict: DataDict) { __data = _dataDict }
+
+                  public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.SmartMeterDeviceType }
+                  public static var __selections: [ApolloAPI.Selection] { [
+                    .field("__typename", String.self),
+                    .field("deviceId", String.self),
+                    .field("status", GraphQLEnum<OctopusAPI.DeviceStatus>.self),
+                    .field("serialNumber", String.self),
+                    .field("type", GraphQLEnum<OctopusAPI.DeviceType>?.self),
+                    .field("model", String.self),
+                    .field("manufacturer", String.self),
+                  ] }
+
+                  public var deviceId: String { __data["deviceId"] }
+                  public var status: GraphQLEnum<OctopusAPI.DeviceStatus> { __data["status"] }
+                  public var serialNumber: String { __data["serialNumber"] }
+                  public var type: GraphQLEnum<OctopusAPI.DeviceType>? { __data["type"] }
+                  public var model: String { __data["model"] }
+                  public var manufacturer: String { __data["manufacturer"] }
+                }
               }
 
               /// Viewer.AccountUserRole.Account.Property.ElectricityMeterPoint.Agreement
@@ -462,6 +493,7 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                   .field("manufacturerCode", String.self),
                   .field("modelName", String.self),
                   .field("hasAndAllowsHhReadings", Bool?.self),
+                  .field("smartDevices", [SmartDevice?]?.self),
                   .field("meterPoint", MeterPoint.self),
                 ] }
 
@@ -482,7 +514,34 @@ public class GetInitialUserDetailsQuery: GraphQLQuery {
                 public var modelName: String { __data["modelName"] }
                 /// Returns if the meter has and allows half hourly readings
                 public var hasAndAllowsHhReadings: Bool? { __data["hasAndAllowsHhReadings"] }
+                public var smartDevices: [SmartDevice?]? { __data["smartDevices"] }
                 public var meterPoint: MeterPoint { __data["meterPoint"] }
+
+                /// Viewer.AccountUserRole.Account.Property.GasMeterPoint.Meter.SmartDevice
+                ///
+                /// Parent Type: `SmartMeterDeviceType`
+                public struct SmartDevice: OctopusAPI.SelectionSet {
+                  public let __data: DataDict
+                  public init(_dataDict: DataDict) { __data = _dataDict }
+
+                  public static var __parentType: ApolloAPI.ParentType { OctopusAPI.Objects.SmartMeterDeviceType }
+                  public static var __selections: [ApolloAPI.Selection] { [
+                    .field("__typename", String.self),
+                    .field("deviceId", String.self),
+                    .field("status", GraphQLEnum<OctopusAPI.DeviceStatus>.self),
+                    .field("serialNumber", String.self),
+                    .field("type", GraphQLEnum<OctopusAPI.DeviceType>?.self),
+                    .field("model", String.self),
+                    .field("manufacturer", String.self),
+                  ] }
+
+                  public var deviceId: String { __data["deviceId"] }
+                  public var status: GraphQLEnum<OctopusAPI.DeviceStatus> { __data["status"] }
+                  public var serialNumber: String { __data["serialNumber"] }
+                  public var type: GraphQLEnum<OctopusAPI.DeviceType>? { __data["type"] }
+                  public var model: String { __data["model"] }
+                  public var manufacturer: String { __data["manufacturer"] }
+                }
 
                 /// Viewer.AccountUserRole.Account.Property.GasMeterPoint.Meter.MeterPoint
                 ///
